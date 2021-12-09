@@ -34,6 +34,7 @@ library
   build-depends:
       base >=4.7 && <5
     , parallel
+    , timeit
   default-language: Haskell2010
 
 executable performance-haskell-exe
@@ -47,6 +48,7 @@ executable performance-haskell-exe
       base >=4.7 && <5
     , parallel
     , performance-haskell
+    , timeit
   default-language: Haskell2010
 
 test-suite performance-haskell-test
@@ -61,4 +63,5 @@ test-suite performance-haskell-test
       base >=4.7 && <5
     , parallel
     , performance-haskell
+    , timeit
   default-language: Haskell2010
