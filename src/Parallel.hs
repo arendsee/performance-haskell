@@ -1,4 +1,4 @@
-module Parallel (twoMeans, twoMeansPar) where
+module Parallel (twoMeans, twoMeansPar, testPara) where
 
 import Control.Parallel (par, pseq)
 
@@ -144,3 +144,11 @@ twoMeansPar n = a `par` b `par` c `par` [a, b, c]
 
 mean :: [Int] -> Double
 mean x = fromIntegral (sum x) / fromIntegral (length x) 
+
+
+testPara = do
+  timeIt . putStrLn . show $ twoMeansPar 1234567
+  timeIt . putStrLn . show $ twoMeans 1234567
+  timeIt . putStrLn . show $ twoMeansPar 1234568
+  timeIt . putStrLn . show $ twoMeans 1234568
+  -- putStrLn $ show $ length $ parSort [1..134]

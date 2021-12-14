@@ -27,6 +27,7 @@ library
   exposed-modules:
       Lib
       Parallel
+      Unboxed
   other-modules:
       Paths_performance_haskell
   hs-source-dirs:
