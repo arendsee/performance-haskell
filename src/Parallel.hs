@@ -1,6 +1,17 @@
-module Parallel (twoMeans, twoMeansPar, testPara) where
+module Parallel
+  ( twoMeans
+  , twoMeansPar
+  , testPara
+  -- , testThreeFibonacci
+  -- , testThreeFibonacciPara
+  , nfib
+  , nfibPara
+  ) where
 
 import Control.Parallel (par, pseq)
+import Control.Parallel.Strategies (Eval, Strategy, rpar, rseq, runEval)
+import Control.DeepSeq (force, NFData)
+import System.TimeIt (timeIt)
 
 -- Control.Parallel only exports these two functions:
 -- par  :: a -> b -> b
@@ -111,12 +122,6 @@ foldr' f b (x:xs) = let b' = f x b in (foldr b xs)
 -- Actually, I've bought that book and will return to parallelism when it
 -- arrives. For now, I'll segue to unboxed types.
 
--- from realworldhaskell
-force :: [a] -> ()
-force xs = go xs `pseq` ()
-    where go (_:xs) = go xs
-          go [] = 1
-
 parSort :: (Ord a) => [a] -> [a]
 parSort (x:xs)    = greater `par` (lesser `pseq`
                                          (lesser ++ x:greater))
@@ -145,6 +150,51 @@ twoMeansPar n = a `par` b `par` c `par` [a, b, c]
 mean :: [Int] -> Double
 mean x = fromIntegral (sum x) / fromIntegral (length x) 
 
+
+prodsum :: Integer -> Integer
+prodsum i = sum $ [x * y * z | x <- [1..i], y <- [1..i], z <- [1..i]]
+
+fibonacci :: Integer -> Integer
+fibonacci 0 = 1
+fibonacci 1 = 1
+fibonacci x = fibonacci (x-1) + fibonacci (x-2)
+
+parMap :: NFData b => (a -> b) -> [a] -> Eval [b]
+parMap f [] = return []
+parMap f (a:as) = do
+  b <- rpar (f a)
+  bs <- parMap f as
+  return (b:bs)
+
+nfibPara = runEval . parTriple $ (fibonacci 34, fibonacci 35, fibonacci 36)
+
+nfib = (fibonacci 34, fibonacci 35, fibonacci 36)
+
+
+parTriple :: Strategy (a, b, c) 
+parTriple (a, b, c) = do
+  a' <- rpar a
+  b' <- rpar b
+  c' <- rpar c
+  return (a', b', c')
+
+
+-- -- no speed up from parallelization? why?
+-- testThreeFibonacciPara = runEval $ do
+--   a <- rpar $ force $ prodsum [1..421]
+--   b <- rpar $ force $ prodsum [2..422]
+--   c <- rpar $ force $ prodsum [3..423]
+--   rseq a
+--   rseq b
+--   rseq c
+--   return ("parallel", a, b, c)
+--
+-- testThreeFibonacci =
+--   let
+--     a = prodsum [4..424]
+--     b = prodsum [5..425]
+--     c = prodsum [6..426]
+--   in ("sequential", a, b, c)
 
 testPara = do
   timeIt . putStrLn . show $ twoMeansPar 1234567

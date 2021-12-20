@@ -4,9 +4,10 @@ module Lib
     ( someFunc
     ) where
 
+import qualified Parallel as FP
+
 import System.TimeIt (timeIt)
 
-import Data.Vector
 -- see a very nice tutorial from FPComplete: https://www.fpcomplete.com/haskell/library/vector/
 
 -- Data.Vector offers immutable vectors that behave much like normal haskell
@@ -42,7 +43,6 @@ import Data.Vector
 -- operations as primitive loops when possible. This avoids large memory
 -- allocations.
 
-module Unboxed () where
 import           Control.Monad.Primitive     (PrimMonad, PrimState)
 import qualified Data.ByteString.Lazy        as L
 import qualified Data.Vector.Generic.Mutable as M
@@ -97,6 +97,11 @@ printFreq index count = putStrLn $ concat
     , show count
     ]
 
+
 someFunc = do
   -- testPara
-  testUnboxed
+  -- testUnboxed
+  -- timeIt . putStrLn . show $ FP.testThreeFibonacci
+  -- timeIt . putStrLn . show $ FP.testThreeFibonacciPara
+  -- timeIt . putStrLn . show $ FP.nfibPara
+  timeIt . putStrLn . show $ FP.nfib
