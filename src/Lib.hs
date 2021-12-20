@@ -103,5 +103,4 @@ someFunc = do
   -- testUnboxed
   -- timeIt . putStrLn . show $ FP.testThreeFibonacci
   -- timeIt . putStrLn . show $ FP.testThreeFibonacciPara
-  -- timeIt . putStrLn . show $ FP.nfibPara
-  timeIt . putStrLn . show $ FP.nfib
+  timeIt . putStrLn . show $ FP.nfibPara

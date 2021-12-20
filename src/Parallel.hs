@@ -4,7 +4,6 @@ module Parallel
   , testPara
   -- , testThreeFibonacci
   -- , testThreeFibonacciPara
-  , nfib
   , nfibPara
   ) where
 
@@ -166,18 +165,19 @@ parMap f (a:as) = do
   bs <- parMap f as
   return (b:bs)
 
-nfibPara = runEval . parTriple $ (fibonacci 34, fibonacci 35, fibonacci 36)
+pdeeppar :: NFData a => Strategy a
+pdeeppar = rpar . force
 
-nfib = (fibonacci 34, fibonacci 35, fibonacci 36)
-
-
-parTriple :: Strategy (a, b, c) 
-parTriple (a, b, c) = do
-  a' <- rpar a
-  b' <- rpar b
-  c' <- rpar c
+evalTriple :: Strategy a -> Strategy b -> Strategy c -> Strategy (a, b, c) 
+evalTriple sa sb sc (a, b, c) = do
+  a' <- sa a
+  b' <- sb b
+  c' <- sc c
   return (a', b', c')
 
+parTriple = evalTriple pdeeppar pdeeppar pdeeppar
+
+nfibPara = runEval . parTriple $ (prodsum 184, prodsum 185, prodsum 186)
 
 -- -- no speed up from parallelization? why?
 -- testThreeFibonacciPara = runEval $ do
